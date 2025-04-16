@@ -12,5 +12,7 @@ COPY --chown=$user:$group stress-arm64 .
 
 RUN chmod +x stress-arm64
 
+RUN date > current_date
+
 ENTRYPOINT ["/app/stress-arm64"]
 
