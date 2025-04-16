@@ -1,14 +1,14 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name:  token
+  name:  stress
   namespace: dev
   labels:
-    app:  token
+    app:  stress
 spec:
   selector:
     matchLabels:
-      app: token
+      app: stress
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -17,7 +17,7 @@ spec:
   template:
     metadata:
       labels:
-        app:  token
+        app:  stress
     spec:
       terminationGracePeriodSeconds: 60
       restartPolicy: Always
@@ -33,13 +33,13 @@ spec:
       #     whenUnsatisfiable: DoNotSchedule
       #     labelSelector:
       #       matchLabels:
-      #         app: token
+      #         app: stress
       containers:
       - name:  webapp
-        image:  648911607072.dkr.ecr.us-east-1.amazonaws.com/token:v1
+        image:  648911607072.dkr.ecr.us-east-1.amazonaws.com/stress:v1
         args:
-          - -redisEndpoint
-          - 'cache.failover.local:6378'
+          - -region
+          - us-east-1
         lifecycle:
           preStop:
             exec:
@@ -72,21 +72,21 @@ spec:
         # - name: DB_HOST
         #   valueFrom:
         #     configMapKeyRef:
-        #       name: token
+        #       name: stress
         #       key: DB_HOST
         # - name: DB_PASS
         #   valueFrom:
         #     secretKeyRef:
-        #       name: token
+        #       name: stress
         #       key: DB_PASS
         ports:
         - containerPort: 8080
-          name:  token
+          name:  stress
 ---
 # kind: ConfigMap
 # apiVersion: v1
 # metadata:
-#   name: token
+#   name: stress
 #   namespace: dev
 # data:
 #   key: default
@@ -94,7 +94,7 @@ spec:
 # apiVersion: v1
 # kind: Secret
 # metadata:
-#   name: token
+#   name: stress
 #   namespace: dev
 # type: Opaque
 # stringData:
@@ -103,14 +103,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: token
+  name: stress
   namespace: dev
 spec:
   selector:
-    app: token
+    app: stress
   type: ClusterIP
   ports:
-  - name: token
+  - name: stress
     protocol: TCP
     port: 8080
     targetPort: 8080
@@ -118,13 +118,13 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler 
 metadata:
-  name: token
+  name: stress
   namespace: dev
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: token
+    name: stress
   minReplicas: 2
   maxReplicas: 64
   behavior:
@@ -161,12 +161,13 @@ spec:
 # apiVersion: vpcresources.k8s.aws/v1beta1
 # kind: SecurityGroupPolicy
 # metadata:
-#   name: token
+#   name: stress
 #   namespace: dev
 # spec:
 #   podSelector:
 #     matchLabels:
-#       app: token
+#       app: stress
 #   securityGroups:
 #     groupIds:
 #       - sg-0ea3daad2e55a0147
+
