@@ -158,29 +158,6 @@ spec:
         type: Utilization
         averageUtilization: 75
 ---
-apiVersion: projectcalico.org/v3
-kind: NetworkPolicy
-metadata:
-  name: stress
-  namespace: dev
-spec:
-  selector: app == 'stress'
-  ingress:
-    # Allow traffic from specific container
-    - action: Allow
-      source:
-        selector: app == 'stress'
-        namespaceSelector: projectcalico.org/name == 'dev'
-        
-    # Make it controlled by security group and block inner-cluster traffic
-    - action: Allow
-      source:
-        nets: ['0.0.0.0/0']
-        notNets: # Inner-cluster ips
-          - 10.100.3.0/24
-          - 10.100.4.0/24
-          - 10.100.5.0/24
----
 # apiVersion: vpcresources.k8s.aws/v1beta1
 # kind: SecurityGroupPolicy
 # metadata:
